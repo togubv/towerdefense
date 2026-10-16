@@ -14,6 +14,13 @@
       "dependencies": {},
       "hash": "b256e570bdb15a0bea9e664af32953068a2ac1e5"
     },
+    "com.leopotam.ecs-unityintegration": {
+      "version": "https://github.com/LeoECSCommunity/ecs-unityintegration.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "127d6a8f02ec987ac724a7fc671b1d5d00b0ea56"
+    },
     "com.unity.ai.navigation": {
       "version": "2.0.14",
       "depth": 0,

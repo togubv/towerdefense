@@ -242,6 +242,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6024002206992099991}
     m_Modifications:
+    - target: {fileID: 2180350572523848472, guid: 9dccdd51adb527e48a14b16056010fd5, type: 3}
+      propertyPath: currency
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3103932543149906585, guid: 9dccdd51adb527e48a14b16056010fd5, type: 3}
       propertyPath: m_Sprite
       value: 

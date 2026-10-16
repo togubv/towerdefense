@@ -39,6 +39,20 @@ namespace TD
                 if (health.currentHealthValue <= 0)
                 {
                     entity.Get<IsDeadTag>();
+
+                    if (entity.Has<RewardComponent>())
+                    {
+                        var reward = entity.Get<RewardComponent>();
+
+                        entity.Get<AddRewardsCommand>() = new AddRewardsCommand
+                        {
+                            gold = reward.gold,
+                            water = reward.water,
+                            fire = reward.fire,
+                            earth = reward.earth,
+                            air = reward.air
+                        };
+                    }
                 }
             }
         }

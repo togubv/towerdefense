@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cb496298eac12945b36eb84eb49bde0, type: 3}
+  m_Name: tower_base
+  m_EditorClassIdentifier: Assembly-CSharp::TD.BuildingPoolData
+  _prefab: {fileID: 8735001309376447420, guid: 20425e33560a85c41875d120c4b20e3e, type: 3}
+  _title: Base
+  _description: 
+  _icon: {fileID: 21300000, guid: 1d81096d5955f4f47b9b5503eff37a63, type: 3}
+  _costGold: 1
+  _attackPerSeconds: 1

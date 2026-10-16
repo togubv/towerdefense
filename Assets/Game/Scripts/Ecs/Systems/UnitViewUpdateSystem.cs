@@ -5,7 +5,7 @@ namespace TD
 {
     public class UnitViewUpdateSystem : IEcsRunSystem
     {
-        private EcsFilter<UnitPosition, UnitViewComponent,
+        private readonly EcsFilter<UnitPosition, UnitViewComponent,
             UnitMovement> _filter;
 
         private readonly float _routeOffset = 0.05f;

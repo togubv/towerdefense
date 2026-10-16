@@ -2,6 +2,10 @@ using UnityEngine;
 using Leopotam.Ecs;
 using System.Collections.Generic;
 
+#if UNITY_EDITOR
+using Leopotam.Ecs.UnityIntegration;
+#endif
+
 namespace TD
 {
     public class EcsLoader : MonoBehaviour
@@ -9,17 +13,20 @@ namespace TD
         public UnitView[] unitPrefabs;
         public ProjectileView projectilePrefab;
         public Transform unitsParent;
+        public Transform buildingsParent;
         public Transform projectilesParent;
         public Transform routesParent;
         public int unitsAmount;
         public float spawnCooldown = 1f;
+        public string mobId;
         public Transform[] spawnPoints;
-        public TriggerObserver[] towers;
+        public string[] baseBuildingIds;
 
         [Header("UI")]
         public Canvas canvas;
         public BarsView barsView;
         public GameView gameView;
+        public BuildView buildView;
 
         private EcsWorld _world;
         private EcsSystems _systems;
@@ -27,18 +34,23 @@ namespace TD
 
         private RouteStorage _routeStorage;
 
-        private float _spawnCooldownTimer;
-        private int _spawnedUnitsCount;
-
         private void Start()
         {
             _world = new EcsWorld();
+            _systems = new EcsSystems(_world);
+
+            var staticData = new StaticDataProvider();
+            staticData.Init();
+
+#if UNITY_EDITOR
+            EcsWorldObserver.Create(_world);
+            EcsSystemsObserver.Create(_systems);
+#endif
 
             InitPlayer();
             InitRoutes();
-            InitUI();
+            InitUI(staticData);
 
-            _systems = new EcsSystems(_world);
             _systems
 
                 // UNITS
@@ -61,22 +73,38 @@ namespace TD
 
                 .Add(new HealthSystem(_world))
 
-                // UI
-                .Add(new HealthBarUpdateSystem(barsView))
-
                 // GAME
                 .Add(new CurrencySystem(_playerEntity))
+                .Add(new WaveSystem(_world, staticData))
+                .Add(new UnitSpawnSystem(_world, _routeStorage))
+                .Add(new PlacementInitSystem(_world, staticData))
+                .Add(new PlacementUpdateSystem(_world))
+                .Add(new BuildSpawnSystem(_world))
+                .Add(new BuildingViewSystem(_world, buildingsParent))
+
+                // UI
+                .Add(new InputProcessingUISystem(_world))
+                .Add(new HealthBarUpdateSystem(barsView))
+                .Add(new CurrencyUpdateSystem(gameView))
                 ;
 
-            InitTowers();
-
             _systems.Init();
+
+            StartWave();
         }
 
-        private void InitUI()
+        private void InitUI(StaticDataProvider staticData)
         {
             barsView.Init();
             barsView.InitCanvas(canvas);
+            buildView.Init(_world);
+
+            var baseBuildings = new List<BuildingPoolData>();
+            foreach (var b in baseBuildingIds)
+            {
+                baseBuildings.Add(staticData.GetBuildingData(b));
+            }
+            buildView.InitSlots(baseBuildings.ToArray());
         }
 
         private void InitPlayer()
@@ -98,73 +126,19 @@ namespace TD
             }
         }
 
-        private void InitTowers()
+        private void StartWave()
         {
-            foreach (var t in towers)
-            {
-                var entity = _world.NewEntity();
-
-                entity.Get<TowerTargetsComponent>().targetsInRadius =
-                    new HashSet<EcsEntity>();
-
-                entity.Get<TowerAttackComponent>() = new TowerAttackComponent
-                {
-                    muzzleTrans = t.muzzleTrans,
-                    attackCooldownDuration = 1f,
-                    attackCooldownTimer = 0f
-                };
-
-                entity.Get<UnitPosition>() = new UnitPosition()
-                {
-                    value = t.transform.position
-                };
-
-                t.Init(_world, entity);
-            }
-        }
-
-        private void SpawnUnit(int id)
-        {
-            if (_spawnedUnitsCount >= unitsAmount)
-            {
-                return;
-            }
-
-            var entity = _world.NewEntity();
-
-            ref var movement = ref entity.Get<UnitMovement>();
-            movement.routeId = id;
-            movement.routeStorage = _routeStorage;
-            movement.pointIndex = 0;
-            movement.speed = 3f;
-
-            ref var position = ref entity.Get<UnitPosition>();
-            position.value = spawnPoints[id].position;
-            _spawnedUnitsCount += 1;
-
-            ref var state = ref entity.Get<UnitStateComponent>();
-            state.unitId = Random.Range(0, unitPrefabs.Length);
-
-            ref var hide = ref entity.Get<UnitHideComponent>();
-
-            entity.Get<UnitHealthComponent>() = new UnitHealthComponent()
-                {
-                    baseHealthValue = 5,
-                    currentHealthValue = 5
-                };
+            var waveEntity = _world.NewEntity();
+            ref var wave = ref waveEntity.Get<WaveComponent>();
+            wave.mobId = mobId;
+            wave.spawnPos = spawnPoints[0].position;
+            wave.spawnPeriod = spawnCooldown;
+            wave.amount = unitsAmount;
         }
 
         private void Update()
         {
             _systems.Run();
-
-            _spawnCooldownTimer += Time.deltaTime;
-
-            if (_spawnCooldownTimer > spawnCooldown)
-            {
-                _spawnCooldownTimer -= spawnCooldown;
-                SpawnUnit(Random.Range(0, unitPrefabs.Length));
-            }
         }
 
         private void OnDestroy()
