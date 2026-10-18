@@ -23,6 +23,10 @@ namespace TD
 
                 switch (command.currency)
                 {
+                    case CurrencyType.Lives:
+                        currency.lives += command.value;
+                        break;
+
                     case CurrencyType.Gold:
                         currency.gold += command.value;
                         break;
@@ -51,6 +55,13 @@ namespace TD
             {
                 ref var rewards = ref _rewards.Get1(i);
                 ref var currency = ref _playerEntity.Get<PlayerCurrencyComponent>();
+
+                if (rewards.lives > 0)
+                {
+                    currency.lives += rewards.lives;
+                    _rewards.GetEntity(i).Get<CurrencyChangedEvent>() =
+                        new CurrencyChangedEvent(CurrencyType.Lives, currency.lives);
+                }
 
                 if (rewards.gold > 0)
                 {

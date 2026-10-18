@@ -90,6 +90,7 @@ namespace TD
 
             _systems.Init();
 
+            AddLevelLives(30);
             StartWave();
         }
 
@@ -124,6 +125,13 @@ namespace TD
             {
                 r.Initialize(_routeStorage);
             }
+        }
+
+        private void AddLevelLives(int value)
+        {
+            var addingEntity = _world.NewEntity();
+            ref var adding = ref addingEntity.Get<AddRewardsCommand>();
+            adding.lives = value;
         }
 
         private void StartWave()

@@ -2,7 +2,7 @@
 {
     public enum CurrencyType
     {
-        None = 0,
+        Lives = 0,
         Gold = 1,
         Water = 2,
         Fire = 3,

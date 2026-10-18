@@ -2,6 +2,7 @@
 {
     public struct PlayerCurrencyComponent
     {
+        public int lives;
         public int gold;
         public int water;
         public int fire;
