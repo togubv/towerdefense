@@ -7,7 +7,8 @@ namespace TD
 {
     public class ObjectClickInput : MonoBehaviour
     {
-        [SerializeField] private LayerMask _layerMask;
+        [SerializeField] private LayerMask _buildingLayer;
+        [SerializeField] private LayerMask _groundLayer;
 
         private EcsWorld _world;
         private Camera _camera;
@@ -36,9 +37,9 @@ namespace TD
 
                 var eventEntity = _world.NewEntity();
 
-                if (Physics.Raycast(ray, out RaycastHit hit, 100f, _layerMask))
+                if (Physics.Raycast(ray, out RaycastHit buildingHit, 100f, _buildingLayer))
                 {
-                    if (hit.collider.TryGetComponent(out BuildingView buildingView))
+                    if (buildingHit.collider.TryGetComponent(out BuildingView buildingView))
                     {
                         ref var clickEvent = ref eventEntity.Get<ObjectClickedEvent>();
                         clickEvent.view = buildingView;
@@ -50,6 +51,12 @@ namespace TD
 
                 ref var nullEvent = ref eventEntity.Get<ObjectClickedEvent>();
                 nullEvent.view = null;
+
+                if (Physics.Raycast(ray, out RaycastHit groundHit, 100f, _groundLayer))
+                {
+                    eventEntity.Get<GroundClickedEvent>();
+                    return;
+                }
             }
         }
     }

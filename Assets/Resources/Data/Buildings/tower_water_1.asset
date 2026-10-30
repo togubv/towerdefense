@@ -13,11 +13,27 @@ MonoBehaviour:
   m_Name: tower_water_1
   m_EditorClassIdentifier: Assembly-CSharp::TD.BuildingPoolData
   _prefab: {fileID: 7872748032756291049, guid: 703ea9df0cf5a4b4d8001190c7c5d533, type: 3}
-  _title: Water 1
+  _title: Water
   _description: 
   _icon: {fileID: 21300000, guid: e1660b2e72f26624cbbbf805e8d0b2a8, type: 3}
   _costs:
   - currency: 2
     value: 1
-  _upgrades: []
+  _upgrades:
+  - data: {fileID: 11400000, guid: de351c4a4f5351d4aa2905e5e0a8592f, type: 2}
+    costs:
+    - currency: 2
+      value: 0
+  - data: {fileID: 11400000, guid: 72e62eeb472fa7842bec00761babfe67, type: 2}
+    costs:
+    - currency: 3
+      value: 1
+  - data: {fileID: 11400000, guid: 0dfda458b7ac1944c9a33fe0437ffd0b, type: 2}
+    costs:
+    - currency: 4
+      value: 1
+  - data: {fileID: 11400000, guid: 2dece8359710b07438f9ebdaa3c42c38, type: 2}
+    costs:
+    - currency: 5
+      value: 1
   _attackPerSeconds: 0.5

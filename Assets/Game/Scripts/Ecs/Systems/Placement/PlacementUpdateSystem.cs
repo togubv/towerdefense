@@ -11,6 +11,7 @@ namespace TD
     public class PlacementUpdateSystem : IEcsRunSystem, IEcsInitSystem
     {
         private readonly EcsFilter<PlacementPreviewComponent> _previews;
+        private readonly EcsFilter<GroundClickedEvent> _groundClick;
 
         private readonly EcsWorld _world;
         private readonly EcsEntity _playerEntity;
@@ -38,19 +39,19 @@ namespace TD
                 return;
             }
 
-            Ray ray = _mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
-
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f, _layerMask))
+            foreach (var i in _previews)
             {
-                if (hit.collider.gameObject.layer == 8)
-                {
-                    Vector3 targetPosition = hit.point;
-                    targetPosition.x = Mathf.Round(targetPosition.x);
-                    targetPosition.z = Mathf.Round(targetPosition.z);
+                ref var preview = ref _previews.Get1(i);
 
-                    foreach (var i in _previews)
+                Ray ray = _mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+                if (Physics.Raycast(ray, out RaycastHit hit, 100f, _layerMask))
+                {
+                    if (hit.collider.gameObject.layer == 8)
                     {
-                        ref var preview = ref _previews.Get1(i);
+                        Vector3 targetPosition = hit.point;
+                        targetPosition.x = Mathf.Round(targetPosition.x);
+                        targetPosition.z = Mathf.Round(targetPosition.z);
 
                         if (preview.previewTrans != null)
                         {
@@ -58,9 +59,9 @@ namespace TD
                             preview.view.SetUnplaceableState(false);
                         }
 
-                        if (Mouse.current.leftButton.wasPressedThisFrame)
+                        foreach (var k in _groundClick)
                         {
-                            var possibleBlockedCells = new HashSet<Vector2Int> (_gridManager.blockedCells);
+                            var possibleBlockedCells = new HashSet<Vector2Int>(_gridManager.blockedCells);
                             possibleBlockedCells.Add(new Vector2Int((int)targetPosition.x, (int)targetPosition.z));
 
                             var path = GridPathfinder.FindPath(
@@ -76,6 +77,8 @@ namespace TD
                                 Debug.Log("CANT PLACE! (BLOCK PATH)");
                                 return;
                             }
+
+                            ref var groundClick = ref _groundClick.Get1(k);
 
                             // Создаем запрос на реальную постройку здания
                             var requestEntity = _world.NewEntity();
@@ -98,35 +101,33 @@ namespace TD
                             // Удаляем призрак
                             Object.Destroy(preview.previewTrans.gameObject);
                             _previews.GetEntity(i).Destroy();
-                        }
 
-                        // Отмена на ПКМ
-                        if (Mouse.current.rightButton.wasPressedThisFrame)
-                        {
-                            Object.Destroy(preview.previewTrans.gameObject);
-                            _previews.GetEntity(i).Destroy();
+                            _groundClick.GetEntity(k).Destroy();
                         }
+                    }
+
+                    // Отмена на ПКМ
+                    if (Mouse.current.rightButton.wasPressedThisFrame)
+                    {
+                        Object.Destroy(preview.previewTrans.gameObject);
+                        _previews.GetEntity(i).Destroy();
                     }
                 }
                 else
                 {
                     Vector3 targetPosition = hit.point;
 
-                    foreach (var i in _previews)
+                    if (preview.previewTrans != null)
                     {
-                        ref var preview = ref _previews.Get1(i);
-
-                        if (preview.previewTrans != null)
-                        {
-                            preview.previewTrans.position = targetPosition;
-                            preview.view.SetUnplaceableState(true);
-                        }
-
-                        if (Mouse.current.leftButton.wasPressedThisFrame)
-                        {
-                            Debug.Log("CANT PLACE!");
-                        }
+                        preview.previewTrans.position = targetPosition;
+                        preview.view.SetUnplaceableState(true);
                     }
+
+                    if (Mouse.current.leftButton.wasPressedThisFrame)
+                    {
+                        Debug.Log("CANT PLACE!");
+                    }
+
                 }
             }
         }

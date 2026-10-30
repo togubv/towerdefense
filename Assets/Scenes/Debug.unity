@@ -6801,6 +6801,8 @@ MonoBehaviour:
     value: 3
   - currency: 5
     value: 1
+  - currency: 2
+    value: 2
   objectClickInput: {fileID: 879990342}
   canvas: {fileID: 289416470}
   barsView: {fileID: 1183726114}
@@ -6834,9 +6836,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20526b140b1c33540a14e0d2267e7dfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TD.ObjectClickInput
-  _layerMask:
+  _buildingLayer:
     serializedVersion: 2
     m_Bits: 1024
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!1001 &882039832
 PrefabInstance:
   m_ObjectHideFlags: 0
