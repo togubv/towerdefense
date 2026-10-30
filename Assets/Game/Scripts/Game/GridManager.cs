@@ -8,6 +8,7 @@ namespace TD
     {
         public int cellsWidth { get; private set; }
         public int cellsHeight { get; private set; }
+        public Vector2Int startCell { get; private set; }
         public Vector2Int destinationCell { get; private set; }
 
         public HashSet<Vector2Int> blockedCells { get; private set; }
@@ -15,13 +16,14 @@ namespace TD
         private EcsWorld _world;
 
         public GridManager(EcsWorld world, int cellsWidth, int cellsHeight,
-            Vector2Int destinationCell)
+           Vector2Int startCell , Vector2Int destinationCell)
         {
             blockedCells = new HashSet<Vector2Int>();
 
             _world = world;
             this.cellsWidth = cellsWidth;
             this.cellsHeight = cellsHeight;
+            this.startCell = startCell;
             this.destinationCell = destinationCell;
         }
 

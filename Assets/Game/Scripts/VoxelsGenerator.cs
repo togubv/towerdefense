@@ -33,7 +33,6 @@ namespace TD
 
             boxCollider.size = new Vector3(matrixSize.x, 1, matrixSize.y);
             boxCollider.center = new Vector3(matrixSize.x / 2 - 0.5f, 0, matrixSize.y / 2 - 0.5f);
-            voxelsParent.position = new Vector3(-matrixSize.x / 2, -0.5f, -matrixSize.y / 2);
 
             for (int i = 0; i < matrixSize.x; i++)
             {

@@ -20,8 +20,8 @@ namespace TD
         public int unitsAmount;
         public float spawnCooldown = 1f;
         public string mobId;
-        public Transform[] spawnPoints;
         public string[] baseBuildingIds;
+        public Vector2Int startCell;
         public Vector2Int destinationCell;
         public CurrencyAmount[] startCurrencies;
 
@@ -55,6 +55,7 @@ namespace TD
                 _world,
                 voxelsGenerator.matrixSize.x,
                 voxelsGenerator.matrixSize.y,
+                startCell,
                 destinationCell);
 
 #if UNITY_EDITOR
@@ -96,7 +97,7 @@ namespace TD
 
                 .Add(new BuildRequestSystem(_world, _playerEntity, staticData))
                 .Add(new PlacementInitSystem(_world, staticData))
-                .Add(new PlacementUpdateSystem(_world, _playerEntity))
+                .Add(new PlacementUpdateSystem(_world, _playerEntity, _gridManager))
                 .Add(new BuildSpawnSystem(_world, _gridManager))
                 .Add(new BuildingViewSystem(_world, buildingsParent))
                 .Add(new ObjectClickedSystem(upgradeView, staticData, _playerEntity))
@@ -171,7 +172,7 @@ namespace TD
             var waveEntity = _world.NewEntity();
             ref var wave = ref waveEntity.Get<WaveComponent>();
             wave.mobId = mobId;
-            wave.spawnPos = spawnPoints[0].position;
+            wave.spawnPos = new Vector3(startCell.x, 0, startCell.y);
             wave.spawnPeriod = spawnCooldown;
             wave.amount = unitsAmount;
         }

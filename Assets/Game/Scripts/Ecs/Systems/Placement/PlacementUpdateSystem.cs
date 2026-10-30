@@ -1,4 +1,5 @@
-﻿using Leopotam.Ecs;
+﻿using System.Collections.Generic;
+using Leopotam.Ecs;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,13 +14,16 @@ namespace TD
 
         private readonly EcsWorld _world;
         private readonly EcsEntity _playerEntity;
+        private readonly GridManager _gridManager;
         private Camera _mainCamera;
         private readonly int _layerMask = (1 << 8) | (1 << 9);
 
-        public PlacementUpdateSystem(EcsWorld world, EcsEntity playerEntity)
+        public PlacementUpdateSystem(EcsWorld world, EcsEntity playerEntity,
+            GridManager gridManager)
         {
             _world = world;
             _playerEntity = playerEntity;
+            _gridManager = gridManager;
         }
 
         public void Init()
@@ -56,6 +60,23 @@ namespace TD
 
                         if (Mouse.current.leftButton.wasPressedThisFrame)
                         {
+                            var possibleBlockedCells = new HashSet<Vector2Int> (_gridManager.blockedCells);
+                            possibleBlockedCells.Add(new Vector2Int((int)targetPosition.x, (int)targetPosition.z));
+
+                            var path = GridPathfinder.FindPath(
+                                _gridManager.startCell,
+                                _gridManager.destinationCell,
+                                _gridManager.cellsWidth,
+                                _gridManager.cellsHeight,
+                                possibleBlockedCells
+                                );
+
+                            if (path == null || path.Count < 1)
+                            {
+                                Debug.Log("CANT PLACE! (BLOCK PATH)");
+                                return;
+                            }
+
                             // Создаем запрос на реальную постройку здания
                             var requestEntity = _world.NewEntity();
                             ref var buildRequest = ref requestEntity.Get<BuildStructureRequest>();
