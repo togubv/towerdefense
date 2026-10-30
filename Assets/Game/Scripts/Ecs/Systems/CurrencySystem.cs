@@ -4,101 +4,60 @@ namespace TD
 {
     public class CurrencySystem : IEcsRunSystem
     {
-        private readonly EcsFilter<ChangeCurrencyCommand> _filter;
-        private readonly EcsFilter<AddRewardsCommand> _rewards;
+        private readonly EcsFilter<IncreaseCurrencyCommand> _increase;
+        private readonly EcsFilter<DecreaseCurrencyCommand> _decrease;
 
-        private EcsEntity _playerEntity;
+        private readonly EcsWorld _world;
+        private readonly EcsEntity _playerEntity;
 
-        public CurrencySystem(EcsEntity playerEntity)
+        public CurrencySystem(EcsWorld world, EcsEntity playerEntity)
         {
+            _world = world;
             _playerEntity = playerEntity;
         }
 
         public void Run()
         {
-            foreach (var i in _filter)
+            foreach (var i in _increase)
             {
-                ref var command = ref _filter.Get1(i);
+                ref var command = ref _increase.Get1(i);
                 ref var currency = ref _playerEntity.Get<PlayerCurrencyComponent>();
+                ref var entity = ref _increase.GetEntity(i);
 
-                switch (command.currency)
+                CurrencyUtility.AddCurrency(ref currency, command.amount);
+
+                foreach (var c in command.amount)
                 {
-                    case CurrencyType.Lives:
-                        currency.lives += command.value;
-                        break;
-
-                    case CurrencyType.Gold:
-                        currency.gold += command.value;
-                        break;
-
-                    case CurrencyType.Water:
-                        currency.water += command.value;
-                        break;
-
-                    case CurrencyType.Fire:
-                        currency.fire += command.value;
-                        break;
-
-                    case CurrencyType.Earth:
-                        currency.earth += command.value;
-                        break;
-
-                    case CurrencyType.Air:
-                        currency.air += command.value;
-                        break;
+                    var currencyValue = CurrencyUtility.GetCurrencyValue(currency, c.currency);
+                    var changedEntity = _world.NewEntity();
+                    ref var changed = ref changedEntity.Get<CurrencyChangedEvent>();
+                    changed.currency = c.currency;
+                    changed.value = currencyValue;
                 }
 
-                _filter.GetEntity(i).Del<PlayerCurrencyComponent>();
+                _increase.GetEntity(i).Destroy();
             }
 
-            foreach (var i in _rewards)
+            foreach (var i in _decrease)
             {
-                ref var rewards = ref _rewards.Get1(i);
+                ref var command = ref _decrease.Get1(i);
                 ref var currency = ref _playerEntity.Get<PlayerCurrencyComponent>();
+                ref var entity = ref _decrease.GetEntity(i);
 
-                if (rewards.lives > 0)
+                bool spended = CurrencyUtility.TrySpend(ref currency, command.amount);
+                if (spended)
                 {
-                    currency.lives += rewards.lives;
-                    _rewards.GetEntity(i).Get<CurrencyChangedEvent>() =
-                        new CurrencyChangedEvent(CurrencyType.Lives, currency.lives);
+                    foreach (var c in command.amount)
+                    {
+                        var currencyValue = CurrencyUtility.GetCurrencyValue(currency, c.currency);
+                        var changedEntity = _world.NewEntity();
+                        ref var changed = ref changedEntity.Get<CurrencyChangedEvent>();
+                        changed.currency = c.currency;
+                        changed.value = currencyValue;
+                    }
                 }
 
-                if (rewards.gold > 0)
-                {
-                    currency.gold += rewards.gold;
-                    _rewards.GetEntity(i).Get<CurrencyChangedEvent>() =
-                        new CurrencyChangedEvent(CurrencyType.Gold, currency.gold);
-                }
-
-                if (rewards.water > 0)
-                {
-                    currency.water += rewards.water;
-                    _rewards.GetEntity(i).Get<CurrencyChangedEvent>() =
-                        new CurrencyChangedEvent(CurrencyType.Water, currency.water);
-                }
-
-                if (rewards.fire > 0)
-                {
-                    currency.fire += rewards.fire;
-                    _rewards.GetEntity(i).Get<CurrencyChangedEvent>() =
-                        new CurrencyChangedEvent(CurrencyType.Fire, currency.fire);
-                }
-
-                if (rewards.earth > 0)
-                {
-                    currency.earth += rewards.earth;
-                    _rewards.GetEntity(i).Get<CurrencyChangedEvent>() =
-                        new CurrencyChangedEvent(CurrencyType.Earth, currency.earth);
-                }
-
-                if (rewards.air > 0)
-                {
-                    currency.air += rewards.air;
-                    _rewards.GetEntity(i).Get<CurrencyChangedEvent>() =
-                        new CurrencyChangedEvent(CurrencyType.Air, currency.air);
-                }
-
-                _rewards.GetEntity(i).Del<AddRewardsCommand>();
+                _decrease.GetEntity(i).Destroy();
             }
         }
     }

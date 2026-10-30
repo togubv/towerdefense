@@ -74,8 +74,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -256,7 +256,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 0}
+  m_TargetGraphic: {fileID: 8577502417118866217}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
@@ -275,6 +275,7 @@ MonoBehaviour:
   button: {fileID: 6276672090388169401}
   iconImage: {fileID: 6827423077651887470}
   titleText: {fileID: 8837992348521788584}
+  notAvailableColor: {r: 0.39215687, g: 0.39215687, b: 0.39215687, a: 1}
 --- !u!1 &6951670700197043833
 GameObject:
   m_ObjectHideFlags: 0

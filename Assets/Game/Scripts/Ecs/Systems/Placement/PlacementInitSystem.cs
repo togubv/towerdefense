@@ -39,6 +39,7 @@ namespace TD
                     ref var preview = ref previewEntity.Get<PlacementPreviewComponent>();
                     preview.data = buildingData;
                     preview.previewTrans = previewView.transform;
+                    preview.view = previewView;
                 }
 
                 _requests.GetEntity(i).Destroy();

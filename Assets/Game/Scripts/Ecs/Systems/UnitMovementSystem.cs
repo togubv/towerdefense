@@ -1,4 +1,3 @@
-using System;
 using Leopotam.Ecs;
 using UnityEngine;
 
@@ -6,7 +5,15 @@ namespace TD
 {
     public class UnitMovementSystem : IEcsRunSystem
     {
-        private EcsFilter<UnitMovement, UnitPosition, UnitStateComponent>.Exclude<IsDeadTag> _filter;
+        private readonly EcsFilter<UnitMovement, UnitPosition, UnitStateComponent>
+            .Exclude<IsDeadTag> _filter;
+
+        private readonly EcsWorld _world;
+
+        public UnitMovementSystem(EcsWorld world)
+        {
+            _world = world;
+        }
 
         public void Run()
         {
@@ -16,7 +23,7 @@ namespace TD
                 ref var position = ref _filter.Get2(i);
                 ref var state = ref _filter.Get3(i);
 
-                var route = movement.routeStorage.Get(movement.routeId);
+                var path = movement.path;
 
                 if (state.current == UnitStateType.Hidden ||
                     state.current == UnitStateType.Hide)
@@ -24,30 +31,44 @@ namespace TD
                     continue;
                 }
 
-                if (movement.pointIndex > route.points.Length - 1)
+                if (path == null || path.Length < 1)
                 {
-                    if (route.points[0] == route.points[^1])
+                    continue;
+                }
+
+                if (movement.pathIndex > path.Length - 1)
+                {
+                    if (path[0] == path[^1])
                     {
-                        movement.pointIndex = 0;
+                        movement.pathIndex = 0;
                     }
                     else
                     {
-                        state.current = UnitStateType.Hide;
+                        var decreaseLiveEntity = _world.NewEntity();
+                        ref var decreaseCurrency = ref decreaseLiveEntity.Get<DecreaseCurrencyCommand>();
+                        decreaseCurrency.amount = new CurrencyAmount[]
+                            {
+                                new() { currency = CurrencyType.Lives, value = 1 }
+                            };
+
+                        ref var deadTag = ref _filter.GetEntity(i).Get<IsDeadTag>();
+                        deadTag.withAnimation = false;
                         continue;
                     }
                 }
 
-                Vector3 target = route.points[movement.pointIndex];
+                var targetVector2Int = path[movement.pathIndex];
 
                 if (movement.isReturn)
                 {
-                    target = route.points[route.points.Length - 1 - movement.pointIndex];
+                    targetVector2Int = path[path.Length - 1 - movement.pathIndex];
                 }
                 else
                 {
-                    target = route.points[movement.pointIndex];
+                    targetVector2Int = path[movement.pathIndex];
                 }
 
+                var target = new Vector3(targetVector2Int.x, position.value.y, targetVector2Int.y);
                 Vector3 direction = target - position.value;
 
                 float distance = direction.magnitude;
@@ -56,7 +77,7 @@ namespace TD
                 if (distance <= step)
                 {
                     position.value = target;
-                    movement.pointIndex += 1;
+                    movement.pathIndex += 1;
                 }
                 else
                 {

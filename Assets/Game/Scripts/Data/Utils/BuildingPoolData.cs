@@ -9,7 +9,8 @@ namespace TD
         [SerializeField] private string _title;
         [SerializeField] private string _description;
         [SerializeField] private Sprite _icon;
-        [SerializeField] private int _costGold;
+        [SerializeField] private CurrencyAmount[] _costs;
+        [SerializeField] private BuildingUpgradeData[] _upgrades;
         [Header("Stats")]
         [SerializeField] private float _attackPerSeconds = 1f;
 
@@ -18,7 +19,8 @@ namespace TD
         public string title => _title;
         public string description => _description;
         public Sprite icon => _icon;
-        public int costGold => _costGold;
+        public CurrencyAmount[] costs => _costs;
+        public BuildingUpgradeData[] upgrades => _upgrades;
         public float attackPerSeconds => _attackPerSeconds;
     }
 }

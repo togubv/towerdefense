@@ -6,5 +6,6 @@ namespace TD
     {
         public BuildingPoolData data;
         public Transform previewTrans;
+        public BuildingView view;
     }
 }

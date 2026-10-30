@@ -26,8 +26,10 @@ namespace TD
                 var view = Object.Instantiate(viewWaiter.poolData.prefab, viewWaiter.spawnPos,
                     Quaternion.identity, _parent);
 
-                entity.Get<BuildingViewComponent>().trans = view.transform;
-                entity.Get<BuildingViewComponent>().view = view;
+                ref var viewComponent = ref entity.Get<BuildingViewComponent>();
+                viewComponent.entity = entity;
+                viewComponent.trans = view.transform;
+                viewComponent.view = view;
                 entity.Get<TowerAttackComponent>().muzzleTrans = view.triggerObserver.muzzleTrans;
 
                 view.triggerObserver.Init(_world, entity);

@@ -1,5 +1,4 @@
 ﻿using Leopotam.Ecs;
-using UnityEngine;
 
 namespace TD
 {
@@ -7,7 +6,7 @@ namespace TD
     {
         private readonly EcsFilter<TowerAttackComponent, TowerTargetComponent, UnitPosition> _filter;
 
-        private EcsWorld _world;
+        private readonly EcsWorld _world;
 
         public TowerAttackSystem(EcsWorld world)
         {

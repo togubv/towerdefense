@@ -18,8 +18,6 @@ MonoBehaviour:
   _icon: {fileID: 0}
   _baseHealthValue: 5
   _movespeed: 3
-  _gold: 1
-  _water: 0
-  _fire: 0
-  _earth: 0
-  _air: 0
+  _rewards:
+  - currency: 0
+    value: 1

@@ -19,8 +19,7 @@ namespace TD
                     continue;
                 }
 
-                view.view.animator.SetInteger("state",
-                    (int)state.current);
+                view.view.animator.SetInteger("state", (int)state.current);
 
                 state.previous = state.current;
             }

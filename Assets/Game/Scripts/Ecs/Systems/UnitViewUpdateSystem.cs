@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace TD
 {
+    /// <summary>
+    /// Обновляет позиции View, если IsDeadTag - уничтожает View.
+    /// </summary>
     public class UnitViewUpdateSystem : IEcsRunSystem
     {
         private readonly EcsFilter<UnitPosition, UnitViewComponent,
@@ -11,11 +14,18 @@ namespace TD
         private readonly float _routeOffset = 0.05f;
         private readonly float _clamp = 5f;
 
+        private readonly BarsUIView _view;
+
+        public UnitViewUpdateSystem(BarsUIView view)
+        {
+            _view = view;
+        }
+
         public void Run()
         {
             foreach (var i in _filter)
             {
-                var entity = _filter.GetEntity(i);                
+                var entity = _filter.GetEntity(i);
 
                 ref var position = ref _filter.Get1(i);
                 ref var view = ref _filter.Get2(i);
@@ -23,6 +33,8 @@ namespace TD
 
                 if (entity.Has<IsDeadTag>())
                 {
+                    _view.HideHealthBar(view.trans);
+
                     if (view.view != null)
                     {
                         Object.Destroy(view.view.gameObject);

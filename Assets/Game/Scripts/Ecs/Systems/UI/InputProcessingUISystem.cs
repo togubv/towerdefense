@@ -1,5 +1,4 @@
 ﻿using Leopotam.Ecs;
-using UnityEngine;
 
 namespace TD
 {
@@ -19,13 +18,13 @@ namespace TD
             foreach (var i in _filter)
             {
                 ref var clickRequest = ref _filter.Get1(i);
+                var requestEntity = _world.NewEntity();
 
                 switch (clickRequest.requestType)
                 {
                     case UIRequestType.BuildingSelect:
-                        var requestEntity = _world.NewEntity();
-                        ref var request = ref requestEntity.Get<StartPlacementRequest>();
-                        request.buildingId = clickRequest.id;
+                        ref var buildRequest = ref requestEntity.Get<BuildRequest>();
+                        buildRequest.buildingId = clickRequest.id;
                         break;
                 }
 

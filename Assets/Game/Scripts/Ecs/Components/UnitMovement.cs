@@ -1,10 +1,11 @@
-﻿namespace TD
+﻿using UnityEngine;
+
+namespace TD
 {
     public struct UnitMovement
     {
-        public RouteStorage routeStorage;
-        public int routeId;
-        public int pointIndex;
+        public Vector2Int[] path;
+        public int pathIndex;
         public float speed;
         public bool isReturn;
     }

@@ -7,7 +7,7 @@ namespace TD
     {
         private readonly EcsFilter<UnitHealthComponent, DamageEvent>.Exclude<IsDeadTag> _filter;
 
-        private readonly EcsWorld _world;
+        private EcsWorld _world;
 
         public HealthSystem(EcsWorld world)
         {
@@ -38,19 +38,16 @@ namespace TD
 
                 if (health.currentHealthValue <= 0)
                 {
-                    entity.Get<IsDeadTag>();
+                    ref var deadTag = ref entity.Get<IsDeadTag>();
+                    deadTag.withAnimation = true;
 
                     if (entity.Has<RewardComponent>())
                     {
                         var reward = entity.Get<RewardComponent>();
-
-                        entity.Get<AddRewardsCommand>() = new AddRewardsCommand
+                        var commandEntity = _world.NewEntity();
+                        commandEntity.Get<IncreaseCurrencyCommand>() = new IncreaseCurrencyCommand
                         {
-                            gold = reward.gold,
-                            water = reward.water,
-                            fire = reward.fire,
-                            earth = reward.earth,
-                            air = reward.air
+                            amount = reward.amount
                         };
                     }
                 }

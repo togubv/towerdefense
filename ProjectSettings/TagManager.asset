@@ -14,8 +14,8 @@ TagManager:
   - UnitDetector
   - Unit
   - Ground
-  - 
-  - 
+  - Obstacle
+  - Building
   - 
   - 
   - 

@@ -1,4 +1,5 @@
 ﻿using Leopotam.Ecs;
+using UnityEngine;
 
 namespace TD
 {
@@ -7,12 +8,13 @@ namespace TD
         private readonly EcsFilter<SpawnUnitRequest> _filter;
 
         private readonly EcsWorld _world;
-        private readonly RouteStorage _routeStorage;
 
-        public UnitSpawnSystem(EcsWorld world, RouteStorage routeStorage)
+        private GridManager _gridManager;
+
+        public UnitSpawnSystem(EcsWorld world, GridManager gridManager)
         {
             _world = world;
-            _routeStorage = routeStorage;
+            _gridManager = gridManager;
         }
 
         public void Run()
@@ -23,17 +25,23 @@ namespace TD
                 var data = request.data;
                 var unitEntity = _world.NewEntity();
 
-                ref var movement = ref unitEntity.Get<UnitMovement>();
-                movement.routeId = 0;
-                movement.routeStorage = _routeStorage;
-                movement.pointIndex = 0;
-                movement.speed = data.movespeed;
-
                 ref var position = ref unitEntity.Get<UnitPosition>();
                 position.value = request.worlsPos;
 
+                ref var movement = ref unitEntity.Get<UnitMovement>();
+                var pos = new Vector2Int((int)position.value.x, (int)position.value.z);
+                movement.path = GridPathfinder.FindPath(
+                    pos,
+                    _gridManager.destinationCell,
+                    _gridManager.cellsWidth,
+                    _gridManager.cellsHeight,
+                    _gridManager.blockedCells
+                    ).ToArray();
+
+                movement.pathIndex = 0;
+                movement.speed = data.movespeed;
+
                 ref var state = ref unitEntity.Get<UnitStateComponent>();
-                //state.unitId = Random.Range(0, unitPrefabs.Length);
 
                 ref var hide = ref unitEntity.Get<UnitHideComponent>();
 
@@ -45,11 +53,7 @@ namespace TD
 
                 unitEntity.Get<RewardComponent>() = new RewardComponent()
                 {
-                    gold = data.gold,
-                    water = data.water,
-                    fire = data.fire,
-                    earth = data.earth,
-                    air = data.air
+                    amount = data.rewards
                 };
 
                 _filter.GetEntity(i).Destroy();

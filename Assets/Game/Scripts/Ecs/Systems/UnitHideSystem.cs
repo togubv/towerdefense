@@ -42,15 +42,15 @@ namespace TD
 
                     if (hide.hideTimer > hide.hideDuration)
                     {
-                        movement.pointIndex = 0;
+                        //movement.pointIndex = 0;
                         view.view.gameObject.SetActive(true);
                         state.current = UnitStateType.Idle;
                         hide.hideTimer = 0;
 
-                        // if (movement.isReturn == false)
-                        // {
-                        //     AddCurrency(state.insideBuildingType);
-                        // }
+                        //if (movement.isReturn == false)
+                        //{
+                        //    AddCurrency(state.insideBuildingType);
+                        //}
 
                         movement.isReturn = !movement.isReturn;
                         // state.insideBuildingType = BuildingType.None;
@@ -59,23 +59,23 @@ namespace TD
             }
         }
 
-        // private void AddCurrency(BuildingType insideBuilding)
-        // {
-        //     var entity = _world.NewEntity();
-        //     ref var change = ref entity.Get<ChangeCurrencyCommand>();
+        //private void AddCurrency(BuildingType insideBuilding)
+        //{
+        //    var entity = _world.NewEntity();
+        //    ref var change = ref entity.Get<ChangeCurrencyCommand>();
 
-        //     switch (insideBuilding)
-        //     {
-        //         case BuildingType.Mill:
-        //             change.type = CurrencyType.Food;
-        //             break;
+        //    switch (insideBuilding)
+        //    {
+        //        case BuildingType.Mill:
+        //            change.type = CurrencyType.Food;
+        //            break;
 
-        //         case BuildingType.Sawmill:
-        //             change.type = CurrencyType.Wood;
-        //             break;
-        //     }
+        //        case BuildingType.Sawmill:
+        //            change.type = CurrencyType.Wood;
+        //            break;
+        //    }
 
-        //     change.value = 1;
-        // }
+        //    change.value = 1;
+        //}
     }
 }

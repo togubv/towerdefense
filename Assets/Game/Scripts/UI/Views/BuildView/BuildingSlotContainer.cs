@@ -9,22 +9,39 @@ namespace TD
     {
         public event Action<string> EventClick;
 
-        public Button button;
-        public Image iconImage;
-        public TMP_Text titleText;
+        [SerializeField] private Button button;
+        [SerializeField] private Image iconImage;
+        [SerializeField] private TMP_Text titleText;
+        [SerializeField] private Color notAvailableColor;
 
-        public string buildingId { get; private set; }
+        public BuildingPoolData data { get; private set; }
 
-        public void Init(string buildingId, string title, Sprite icon)
+        public void Init(BuildingPoolData data)
         {
-            this.buildingId = buildingId;
-            titleText.text = title;
-            iconImage.sprite = icon;
+            this.data = data;
+            titleText.text = data.title;
+            iconImage.sprite = data.icon;
+        }
+
+        public void UpdateAvailable(int[] currencies)
+        {
+            bool isAvailable = CurrencyUtility.CanPurchase(currencies, data.costs);
+
+            if (isAvailable)
+            {
+                iconImage.color = Color.white;
+            }
+            else
+            {
+                iconImage.color = notAvailableColor;
+            }
+
+            button.interactable = isAvailable;
         }
         
         private void ClickHandler()
         {
-            EventClick?.Invoke(buildingId);
+            EventClick?.Invoke(data.id);
         }
 
         private void OnEnable()

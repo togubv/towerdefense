@@ -1,4 +1,6 @@
-﻿namespace TD
+﻿using Leopotam.Ecs;
+
+namespace TD
 {
     public struct ClickUIRequest
     {

@@ -10,6 +10,7 @@ namespace TD
 {
     public class EcsLoader : MonoBehaviour
     {
+        public VoxelsGenerator voxelsGenerator;
         public UnitView[] unitPrefabs;
         public ProjectileView projectilePrefab;
         public Transform unitsParent;
@@ -21,26 +22,40 @@ namespace TD
         public string mobId;
         public Transform[] spawnPoints;
         public string[] baseBuildingIds;
+        public Vector2Int destinationCell;
+        public CurrencyAmount[] startCurrencies;
+
+        [Header("Managers")]
+        public ObjectClickInput objectClickInput;
 
         [Header("UI")]
         public Canvas canvas;
-        public BarsView barsView;
-        public GameView gameView;
-        public BuildView buildView;
+        public BarsUIView barsView;
+        public GameUIView gameView;
+        public BuildUIView buildView;
+        public UpgradeUIView upgradeView;
 
         private EcsWorld _world;
         private EcsSystems _systems;
         private EcsEntity _playerEntity;
 
-        private RouteStorage _routeStorage;
+        private GridManager _gridManager;
 
         private void Start()
         {
             _world = new EcsWorld();
             _systems = new EcsSystems(_world);
 
+            objectClickInput.Init(_world);
+
             var staticData = new StaticDataProvider();
             staticData.Init();
+
+            _gridManager = new GridManager(
+                _world,
+                voxelsGenerator.matrixSize.x,
+                voxelsGenerator.matrixSize.y,
+                destinationCell);
 
 #if UNITY_EDITOR
             EcsWorldObserver.Create(_world);
@@ -48,17 +63,19 @@ namespace TD
 #endif
 
             InitPlayer();
-            InitRoutes();
             InitUI(staticData);
 
             _systems
 
+                .Add(new UnitSpawnSystem(_world, _gridManager))
+
+                .Add(new PathUpdateSystem(destinationCell))
+
                 // UNITS
                 .Add(new UnitViewSystem(unitPrefabs, unitsParent))
-                .Add(new UnitMovementSystem())
-                .Add(new UnitViewUpdateSystem())
+                .Add(new UnitMovementSystem(_world))
+                .Add(new UnitViewUpdateSystem(barsView))
                 .Add(new UnitAnimationSystem())
-                .Add(new UnitHideSystem(_world))
 
                 //TOWERS
                 .Add(new TowerTargetsInRadiusUpdateSystem())
@@ -74,22 +91,27 @@ namespace TD
                 .Add(new HealthSystem(_world))
 
                 // GAME
-                .Add(new CurrencySystem(_playerEntity))
+                .Add(new CurrencySystem(_world, _playerEntity))
                 .Add(new WaveSystem(_world, staticData))
-                .Add(new UnitSpawnSystem(_world, _routeStorage))
+
+                .Add(new BuildRequestSystem(_world, _playerEntity, staticData))
                 .Add(new PlacementInitSystem(_world, staticData))
-                .Add(new PlacementUpdateSystem(_world))
-                .Add(new BuildSpawnSystem(_world))
+                .Add(new PlacementUpdateSystem(_world, _playerEntity))
+                .Add(new BuildSpawnSystem(_world, _gridManager))
                 .Add(new BuildingViewSystem(_world, buildingsParent))
+                .Add(new ObjectClickedSystem(upgradeView, staticData, _playerEntity))
+                .Add(new BuildingUpgradeSystem(_world, _playerEntity))
 
                 // UI
                 .Add(new InputProcessingUISystem(_world))
                 .Add(new HealthBarUpdateSystem(barsView))
-                .Add(new CurrencyUpdateSystem(gameView))
+                .Add(new CurrencyUpdateSystem(_playerEntity, gameView,
+                buildView, upgradeView))
                 ;
 
             _systems.Init();
 
+            AddDebugCurrencies();
             AddLevelLives(30);
             StartWave();
         }
@@ -99,12 +121,15 @@ namespace TD
             barsView.Init();
             barsView.InitCanvas(canvas);
             buildView.Init(_world);
+            upgradeView.Init(_world);
+            upgradeView.InitCanvas(canvas);
 
             var baseBuildings = new List<BuildingPoolData>();
             foreach (var b in baseBuildingIds)
             {
                 baseBuildings.Add(staticData.GetBuildingData(b));
             }
+
             buildView.InitSlots(baseBuildings.ToArray());
         }
 
@@ -112,26 +137,33 @@ namespace TD
         {
             _playerEntity = _world.NewEntity();
 
-            ref var currency = ref _playerEntity.Get<PlayerCurrencyComponent>();
-        }
-
-        private void InitRoutes()
-        {
-            _routeStorage = new RouteStorage();
-
-            RouteAuthoring[] route = routesParent.GetComponentsInChildren<RouteAuthoring>();
-
-            foreach (var r in route)
-            {
-                r.Initialize(_routeStorage);
-            }
+            _playerEntity.Get<PlayerCurrencyComponent>() =
+                new PlayerCurrencyComponent
+                {
+                    amount = new int[(int)CurrencyType.Count]
+                };
         }
 
         private void AddLevelLives(int value)
         {
             var addingEntity = _world.NewEntity();
-            ref var adding = ref addingEntity.Get<AddRewardsCommand>();
-            adding.lives = value;
+            ref var adding = ref addingEntity.Get<IncreaseCurrencyCommand>();
+            adding.amount = new CurrencyAmount[]
+                {
+                    new() { currency = CurrencyType.Lives, value = value }
+                };
+        }
+
+        private void AddDebugCurrencies()
+        {
+            if (startCurrencies == null || startCurrencies.Length == 0)
+            {
+                return;
+            }
+
+            var addingEntity = _world.NewEntity();
+            ref var adding = ref addingEntity.Get<IncreaseCurrencyCommand>();
+            adding.amount = startCurrencies;
         }
 
         private void StartWave()

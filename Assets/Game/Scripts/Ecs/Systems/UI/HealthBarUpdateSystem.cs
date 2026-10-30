@@ -6,9 +6,9 @@ namespace TD
     {
         private readonly EcsFilter<HealthChangedEvent, UnitViewComponent> _filter;
 
-        private readonly BarsView _view;
+        private readonly BarsUIView _view;
 
-        public HealthBarUpdateSystem(BarsView view)
+        public HealthBarUpdateSystem(BarsUIView view)
         {
             _view = view;
         }

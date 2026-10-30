@@ -3,6 +3,6 @@
     public enum UIRequestType
     {
         None = 0,
-        BuildingSelect = 1,
+        BuildingSelect = 1
     }
 }

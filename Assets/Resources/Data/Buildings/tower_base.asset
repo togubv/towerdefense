@@ -16,5 +16,18 @@ MonoBehaviour:
   _title: Base
   _description: 
   _icon: {fileID: 21300000, guid: 1d81096d5955f4f47b9b5503eff37a63, type: 3}
-  _costGold: 1
+  _costs: []
+  _upgrades:
+  - data: {fileID: 11400000}
+    costs:
+    - currency: 0
+      value: 1
+  - data: {fileID: 11400000, guid: 9b4b7d53bb9c8fd4bbe272ca3fbc9002, type: 2}
+    costs:
+    - currency: 3
+      value: 1
+  - data: {fileID: 11400000, guid: feaf15f386299694c936303030135946, type: 2}
+    costs:
+    - currency: 2
+      value: 1
   _attackPerSeconds: 1
