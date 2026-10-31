@@ -13,27 +13,38 @@ namespace TD
             {
                 ref var movement = ref _filter.Get1(i);
 
+                // MOVEMENT
+
                 Vector2 input = movement.input;
-                
-                if (input.sqrMagnitude == 0f)
+
+                if (input.sqrMagnitude > 0f)
                 {
-                    continue;
+                    float angle = movement.orbitalFollow.HorizontalAxis.Value;
+                    Quaternion rotation = Quaternion.Euler(0f, angle, 0f);
+
+                    Vector3 forward = rotation * Vector3.forward;
+                    Vector3 right = rotation * Vector3.right;
+                    Vector3 direction = forward * input.y + right * input.x;
+
+                    direction = Vector3.ClampMagnitude(direction, 1f);
+
+                    movement.trans.position += movement.speed * Time.deltaTime * direction;
                 }
 
-                Transform cameraTrans = movement.trans;
-                Vector3 forward = cameraTrans.forward;
-                forward.y = 0f;
-                forward.Normalize();
+                // ROTATE 
 
-                Vector3 right = cameraTrans.right;
-                right.y = 0f;
-                forward.Normalize();
+                if (movement.orbitalFollow != null && movement.rotateInput != 0f)
+                {
+                    var axis = movement.orbitalFollow.HorizontalAxis;
 
-                Vector3 direction = forward * input.y + right * input.x;
+                    axis.Value += movement.rotateInput *
+                                  movement.rotateSpeed *
+                                  Time.deltaTime;
 
-                direction = Vector3.ClampMagnitude(direction, 1f);
+                    axis.Value = Mathf.Repeat(axis.Value + 180f, 360f) - 180f;
 
-                cameraTrans.position += direction * movement.speed * Time.deltaTime;
+                    movement.orbitalFollow.HorizontalAxis = axis;
+                }
             }
         }
     }

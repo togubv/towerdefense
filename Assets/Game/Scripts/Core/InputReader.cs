@@ -16,6 +16,8 @@ namespace TD
 
             _playerInput.Player.CameraMove.performed += CameraMoveHandler;
             _playerInput.Player.CameraMove.canceled += CameraMoveCanceledHandler;
+            _playerInput.Player.CameraRotate.performed += CameraRotateHandler;
+            _playerInput.Player.CameraRotate.canceled += CameraRotatCanceledHandler;
 
             _cameraEntity = cameraEntity;
         }
@@ -26,6 +28,8 @@ namespace TD
             {
                 _playerInput.Player.CameraMove.performed -= CameraMoveHandler;
                 _playerInput.Player.CameraMove.canceled -= CameraMoveCanceledHandler;
+                _playerInput.Player.CameraRotate.performed -= CameraRotateHandler;
+                _playerInput.Player.CameraRotate.canceled -= CameraRotatCanceledHandler;
 
                 _playerInput.Disable();
             }
@@ -41,6 +45,18 @@ namespace TD
         {
             ref var movement = ref _cameraEntity.Get<CameraMovementComponent>();
             movement.input = Vector2.zero;
+        }
+
+        private void CameraRotateHandler(InputAction.CallbackContext ctx)
+        {
+            ref var movement = ref _cameraEntity.Get<CameraMovementComponent>();
+            movement.rotateInput = ctx.ReadValue<float>();
+        }
+
+        private void CameraRotatCanceledHandler(InputAction.CallbackContext ctx)
+        {
+            ref var movement = ref _cameraEntity.Get<CameraMovementComponent>();
+            movement.rotateInput = 0f;
         }
     }
 }

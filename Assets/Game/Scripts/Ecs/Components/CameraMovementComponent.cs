@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Cinemachine;
+using UnityEngine;
 
 namespace TD
 {
@@ -7,5 +8,8 @@ namespace TD
         public Transform trans;
         public Vector2 input;
         public float speed;
+        public float rotateInput;
+        public float rotateSpeed;
+        public CinemachineOrbitalFollow orbitalFollow;
     }
 }

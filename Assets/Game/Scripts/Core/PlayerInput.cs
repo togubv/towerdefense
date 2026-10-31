@@ -103,6 +103,16 @@ namespace TD
                     ""interactions"": """",
                     ""initialStateCheck"": true,
                     ""priority"": 0
+                },
+                {
+                    ""name"": ""CameraRotate"",
+                    ""type"": ""Button"",
+                    ""id"": ""42c1d0b7-eb4e-4bee-8b1f-07ab2b2c3a46"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
                 }
             ],
             ""bindings"": [
@@ -204,6 +214,39 @@ namespace TD
                     ""action"": ""CameraMove"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""a6edb29b-0e24-476d-a48f-bb56c5c3a62a"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CameraRotate"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Positive"",
+                    ""id"": ""596d7993-dff1-4b9f-8e65-7ebe21553884"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CameraRotate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Negative"",
+                    ""id"": ""6a2f5d76-3e62-4180-b406-41791ed92339"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CameraRotate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -274,6 +317,7 @@ namespace TD
             // Player
             m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
             m_Player_CameraMove = m_Player.FindAction("CameraMove", throwIfNotFound: true);
+            m_Player_CameraRotate = m_Player.FindAction("CameraRotate", throwIfNotFound: true);
         }
 
         ~@PlayerInput()
@@ -355,6 +399,7 @@ namespace TD
         private readonly InputActionMap m_Player;
         private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
         private readonly InputAction m_Player_CameraMove;
+        private readonly InputAction m_Player_CameraRotate;
         /// <summary>
         /// Provides access to input actions defined in input action map "Player".
         /// </summary>
@@ -370,6 +415,10 @@ namespace TD
             /// Provides access to the underlying input action "Player/CameraMove".
             /// </summary>
             public InputAction @CameraMove => m_Wrapper.m_Player_CameraMove;
+            /// <summary>
+            /// Provides access to the underlying input action "Player/CameraRotate".
+            /// </summary>
+            public InputAction @CameraRotate => m_Wrapper.m_Player_CameraRotate;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -399,6 +448,9 @@ namespace TD
                 @CameraMove.started += instance.OnCameraMove;
                 @CameraMove.performed += instance.OnCameraMove;
                 @CameraMove.canceled += instance.OnCameraMove;
+                @CameraRotate.started += instance.OnCameraRotate;
+                @CameraRotate.performed += instance.OnCameraRotate;
+                @CameraRotate.canceled += instance.OnCameraRotate;
             }
 
             /// <summary>
@@ -413,6 +465,9 @@ namespace TD
                 @CameraMove.started -= instance.OnCameraMove;
                 @CameraMove.performed -= instance.OnCameraMove;
                 @CameraMove.canceled -= instance.OnCameraMove;
+                @CameraRotate.started -= instance.OnCameraRotate;
+                @CameraRotate.performed -= instance.OnCameraRotate;
+                @CameraRotate.canceled -= instance.OnCameraRotate;
             }
 
             /// <summary>
@@ -525,6 +580,13 @@ namespace TD
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnCameraMove(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "CameraRotate" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnCameraRotate(InputAction.CallbackContext context);
         }
     }
 }

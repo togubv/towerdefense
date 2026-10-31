@@ -1,6 +1,8 @@
 using UnityEngine;
 using Leopotam.Ecs;
 using System.Collections.Generic;
+using Unity.Cinemachine;
+
 
 #if UNITY_EDITOR
 using Leopotam.Ecs.UnityIntegration;
@@ -18,9 +20,11 @@ namespace TD
         public Transform projectilesParent;
         public Transform routesParent;
         public Transform cameraTrans;
+        public CinemachineOrbitalFollow cinemachineOrbital;
         public int unitsAmount;
         public float spawnCooldown = 1f;
         public float cameraSpeed = 10f;
+        public float cameraRotateSpeed = 90f;
         public string mobId;
         public string[] baseBuildingIds;
         public Vector2Int startCell;
@@ -168,6 +172,8 @@ namespace TD
             ref var cameraMovement = ref _cameraEntity.Get<CameraMovementComponent>();
             cameraMovement.trans = cameraTrans;
             cameraMovement.speed = cameraSpeed;
+            cameraMovement.rotateSpeed = cameraRotateSpeed;
+            cameraMovement.orbitalFollow = cinemachineOrbital;
 
             inputReader.Init(_cameraEntity);
         }
