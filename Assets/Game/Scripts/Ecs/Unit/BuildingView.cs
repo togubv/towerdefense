@@ -12,6 +12,7 @@ namespace TD
         public Material[] previewMaterials;
         public Material[] previewMaterialsUnplaeable;
 
+        private Material[] _baseMaterials;
         private bool _isUnplaceable;
 
         public void SetPreviewState()
@@ -20,6 +21,18 @@ namespace TD
             coll.enabled = false;
             hitboxColl.enabled = false;
             meshR.materials = previewMaterials;
+        }
+
+        public void ToggleSelectedState(bool toggle)
+        {
+            if (toggle)
+            {
+                meshR.materials = previewMaterials;
+            }
+            else
+            {
+                meshR.materials = _baseMaterials;
+            }
         }
 
         public void SetUnplaceableState(bool toggle)
@@ -39,6 +52,11 @@ namespace TD
                 _isUnplaceable = false;
                 meshR.materials = previewMaterials;
             }
+        }
+
+        private void Awake()
+        {
+            _baseMaterials = meshR.materials;
         }
     }
 }

@@ -6761,6 +6761,7 @@ GameObject:
   - component: {fileID: 879990341}
   - component: {fileID: 879990340}
   - component: {fileID: 879990342}
+  - component: {fileID: 879990343}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -6788,8 +6789,10 @@ MonoBehaviour:
   buildingsParent: {fileID: 176436625}
   projectilesParent: {fileID: 2081816784}
   routesParent: {fileID: 102654532}
+  cameraTrans: {fileID: 1458847484}
   unitsAmount: 100
   spawnCooldown: 2
+  cameraSpeed: 10
   mobId: mob_1
   baseBuildingIds:
   - tower_base
@@ -6804,6 +6807,7 @@ MonoBehaviour:
   - currency: 2
     value: 2
   objectClickInput: {fileID: 879990342}
+  inputReader: {fileID: 879990343}
   canvas: {fileID: 289416470}
   barsView: {fileID: 1183726114}
   gameView: {fileID: 3185485963260622330}
@@ -6842,6 +6846,18 @@ MonoBehaviour:
   _groundLayer:
     serializedVersion: 2
     m_Bits: 256
+--- !u!114 &879990343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 879990339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c41154940dcd214d883e51ba3a435c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TD.InputReader
 --- !u!1001 &882039832
 PrefabInstance:
   m_ObjectHideFlags: 0

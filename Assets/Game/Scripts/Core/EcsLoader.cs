@@ -17,8 +17,10 @@ namespace TD
         public Transform buildingsParent;
         public Transform projectilesParent;
         public Transform routesParent;
+        public Transform cameraTrans;
         public int unitsAmount;
         public float spawnCooldown = 1f;
+        public float cameraSpeed = 10f;
         public string mobId;
         public string[] baseBuildingIds;
         public Vector2Int startCell;
@@ -27,6 +29,7 @@ namespace TD
 
         [Header("Managers")]
         public ObjectClickInput objectClickInput;
+        public InputReader inputReader;
 
         [Header("UI")]
         public Canvas canvas;
@@ -38,6 +41,8 @@ namespace TD
         private EcsWorld _world;
         private EcsSystems _systems;
         private EcsEntity _playerEntity;
+        private EcsEntity _gameStateEntity;
+        private EcsEntity _cameraEntity;
 
         private GridManager _gridManager;
 
@@ -64,6 +69,8 @@ namespace TD
 #endif
 
             InitPlayer();
+            InitGameState();
+            InitInputReader();
             InitUI(staticData);
 
             _systems
@@ -100,8 +107,10 @@ namespace TD
                 .Add(new PlacementUpdateSystem(_world, _playerEntity, _gridManager))
                 .Add(new BuildSpawnSystem(_world, _gridManager))
                 .Add(new BuildingViewSystem(_world, buildingsParent))
-                .Add(new ObjectClickedSystem(upgradeView, staticData, _playerEntity))
+                .Add(new ObjectClickedSystem(_world, upgradeView, staticData, _playerEntity))
                 .Add(new BuildingUpgradeSystem(_world, _playerEntity))
+                .Add(new BuildingSelectionSystem(_gameStateEntity))
+                .Add(new CameraMovementSystem())
 
                 // UI
                 .Add(new InputProcessingUISystem(_world))
@@ -143,6 +152,24 @@ namespace TD
                 {
                     amount = new int[(int)CurrencyType.Count]
                 };
+        }
+
+        private void InitGameState()
+        {
+            _gameStateEntity = _world.NewEntity();
+            ref var state = ref _gameStateEntity.Get<GameStateComponent>();
+            state.hasSelectedBuilding = false;
+        }
+
+        private void InitInputReader()
+        {
+            _cameraEntity = _world.NewEntity();
+
+            ref var cameraMovement = ref _cameraEntity.Get<CameraMovementComponent>();
+            cameraMovement.trans = cameraTrans;
+            cameraMovement.speed = cameraSpeed;
+
+            inputReader.Init(_cameraEntity);
         }
 
         private void AddLevelLives(int value)

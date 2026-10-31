@@ -7,13 +7,17 @@ namespace TD
         private readonly EcsFilter<ObjectClickedEvent> _filter;
         private readonly EcsFilter<BuildingComponent, BuildingViewComponent> _buildings;
 
+        private EcsWorld _world;
         private UpgradeUIView _upgradeView;
         private StaticDataProvider _staticData;
         private EcsEntity _playerEntity;
 
-        public ObjectClickedSystem(UpgradeUIView upgradeView,
-            StaticDataProvider staticData, EcsEntity playerEntity)
+        public ObjectClickedSystem(EcsWorld world,
+            UpgradeUIView upgradeView,
+            StaticDataProvider staticData,
+            EcsEntity playerEntity)
         {
+            _world = world;
             _upgradeView = upgradeView;
             _staticData = staticData;
             _playerEntity = playerEntity;
@@ -28,6 +32,10 @@ namespace TD
                 if (objectClick.view == null)
                 {
                     _upgradeView.HideUpgrades();
+
+                    var deselectRequestEntity = _world.NewEntity();
+                    deselectRequestEntity.Get<DeselectBuildingRequest>() = 
+                        new DeselectBuildingRequest();
                 }
                 else
                 {
@@ -39,6 +47,12 @@ namespace TD
                         {
                             continue;
                         }
+
+                        var selectRequestEntity = _world.NewEntity();
+                        selectRequestEntity.Get<SelectBuildingRequest>() = new SelectBuildingRequest()
+                        {
+                            entity = view.entity,
+                        };
 
                         ref var building = ref _buildings.Get1(k);
                         var buildingData = _staticData.GetBuildingData(building.buildingId);
